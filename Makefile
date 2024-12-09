@@ -4,6 +4,7 @@ help:
 	@echo "Commands:"
 	@echo "down       : stops all running services"
 	@echo "up         : starts solr with both cores"
+	@echo "clean      : delete generated files"
 	@echo "index-data : indexes data"
 
 down:
@@ -19,7 +20,8 @@ up:
 	curl -X POST -H 'Content-type:application/json' --data-binary @docker/solr/conf/simple_schema.json "http://localhost:8983/solr/ign_simple/schema"
 
 clean:
-	rm results/*/*png
+	rm results/*/*.png
+	rm results/*/*.txt
 
 index-data:
 	@echo "Index Data:"
