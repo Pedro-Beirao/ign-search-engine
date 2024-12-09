@@ -3,25 +3,32 @@
 help:
 	@echo "Commands:"
 	@echo "down       : stops all running services"
-	@echo "up         : starts Solr with both cores"
-	@echo "setup-cores: creates and configures both cores"
-	@echo "index-data : indexes data into both cores"
+	@echo "up         : starts solr with both cores"
+	@echo "index-data : indexes data"
 
 down:
+	docker exec -it $$(docker ps -qf "name=solr") solr delete -c ign_simple
+	sleep 1
 	docker-compose down
 
 up:
 	docker-compose up -d
-
-setup-cores:
+	sleep 1
 	docker exec -it $$(docker ps -qf "name=solr") solr create_core -c ign_simple
+	sleep 1
 	curl -X POST -H 'Content-type:application/json' --data-binary @docker/solr/conf/simple_schema.json "http://localhost:8983/solr/ign_simple/schema"
 
+clean:
+	rm results/*/*png
+
 index-data:
-	curl -X POST -H 'Content-type:application/json' --data-binary "@csv_to_json/ign_processed.json" "http://localhost:8983/solr/ign_simple/update?commit=true"
+	@echo "Index Data:"
+	@echo "index-data-subset : test subset"
 
 index-data-subset:
-	curl -X POST -H 'Content-type:application/json' --data-binary "@csv_to_json/ign_subset.json" "http://localhost:8983/solr/ign_simple/update?commit=true"
+	curl -X POST -H 'Content-type:application/json' --data-binary @csv_to_json/ign_subset.json "http://localhost:8983/solr/ign_simple/update?commit=true"
+index-data-processed:
+	curl -X POST -H 'Content-type:application/json' --data-binary @csv_to_json/ign_processed.json "http://localhost:8983/solr/ign_simple/update?commit=true"
 
 
 query-results-sys1:
