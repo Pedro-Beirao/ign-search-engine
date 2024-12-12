@@ -1,7 +1,7 @@
 {
     "add-field-type": [
       {
-        "name": "game_text",
+        "name": "text_filter",
         "class": "solr.TextField",
         "indexAnalyzer": {
           "tokenizer": {
@@ -20,6 +20,12 @@
               "catenateNumbers": "1",
               "catenateAll": "1",
               "splitOnCaseChange": "1"
+            },
+            {
+              "class": "solr.SynonymGraphFilterFactory",
+              "synonyms": "/var/solr/data/ign_simple/synonyms.txt",
+              "ignoreCase": true,
+              "expand": true
             }
           ]
         },

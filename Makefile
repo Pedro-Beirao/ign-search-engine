@@ -17,8 +17,9 @@ up:
 	sleep 1
 	docker exec -it $$(docker ps -qf "name=solr") solr create_core -c ign_simple
 	sleep 1
-	curl -X POST -H 'Content-type:application/json' --data-binary @schemas/simple_schema.json "http://localhost:8983/solr/ign_simple/schema"
-
+	docker cp solr_config/synonyms.txt $$(docker ps -qf "name=solr"):/var/solr/data/ign_simple/synonyms.txt
+	curl -X POST -H 'Content-type:application/json' --data-binary @schemas/schema.json "http://localhost:8983/solr/ign_simple/schema"
+	curl "http://localhost:8983/solr/admin/cores?action=RELOAD&core=ign_simple"
 clean:
 	rm results/*/*.png
 	rm results/*/*.txt
