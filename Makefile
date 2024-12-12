@@ -17,7 +17,7 @@ up:
 	sleep 1
 	docker exec -it $$(docker ps -qf "name=solr") solr create_core -c ign_simple
 	sleep 1
-	curl -X POST -H 'Content-type:application/json' --data-binary @docker/solr/conf/simple_schema.json "http://localhost:8983/solr/ign_simple/schema"
+	curl -X POST -H 'Content-type:application/json' --data-binary @schemas/simple_schema.json "http://localhost:8983/solr/ign_simple/schema"
 
 clean:
 	rm results/*/*.png
@@ -25,10 +25,14 @@ clean:
 
 index-data:
 	@echo "Index Data:"
-	@echo "index-data-subset : test subset"
+	@echo "index-data-subset"
+	@echo "index-data-fixed"
+	@echo "index-data-processsed"
 
 index-data-subset:
 	curl -X POST -H 'Content-type:application/json' --data-binary @csv_to_json/ign_subset.json "http://localhost:8983/solr/ign_simple/update?commit=true"
+index-data-fixed:
+	curl -X POST -H 'Content-type:application/json' --data-binary @csv_to_json/ign_fixed.json "http://localhost:8983/solr/ign_simple/update?commit=true"
 index-data-processed:
 	curl -X POST -H 'Content-type:application/json' --data-binary @csv_to_json/ign_processed.json "http://localhost:8983/solr/ign_simple/update?commit=true"
 
