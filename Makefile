@@ -27,13 +27,10 @@ clean:
 index-data:
 	@echo "Index Data:"
 	@echo "index-data-subset"
-	@echo "index-data-fixed"
 	@echo "index-data-processsed"
 
 index-data-subset:
 	curl -X POST -H 'Content-type:application/json' --data-binary @csv_to_json/ign_subset.json "http://localhost:8983/solr/ign_simple/update?commit=true"
-index-data-fixed:
-	curl -X POST -H 'Content-type:application/json' --data-binary @csv_to_json/ign_fixed.json "http://localhost:8983/solr/ign_simple/update?commit=true"
 index-data-processed:
 	curl -X POST -H 'Content-type:application/json' --data-binary @csv_to_json/ign_processed.json "http://localhost:8983/solr/ign_simple/update?commit=true"
 
