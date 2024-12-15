@@ -26,7 +26,7 @@ window.onload = function()
             r += "Score%3A" + i.toString() + "%0A"
         }
 
-        const url = "http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=" + q + r;
+        const url = "http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=" + q + "&fq=" + r;
         
         fetch(url, { method: 'GET' }).then(function(response)
         {
