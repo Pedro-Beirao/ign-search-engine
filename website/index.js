@@ -15,19 +15,20 @@ window.onload = function()
                 "Content%3A" + data["ftext"] + "%0A";
         }
 
+        var rmin = 1;
+        if (data["fmin"]) rmin = Number(data["fmin"]);
+        var rmax = 10;
+        if (data["fmax"]) rmax = Number(data["fmax"]);
+
         var r = "";
-        for (var i = Number(data["fmin"]); i <= Number(data["fmax"]) && i != 0; i++)
+        for (var i = rmin; i <= rmax && i != 0; i++)
         {
             r += "Score%3A" + i.toString() + "%0A"
         }
 
         const url = "http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=" + q + r;
-
-        console.log(url);
         
-        fetch(url, {
-            method: 'GET'
-        }).then(function(response)
+        fetch(url, { method: 'GET' }).then(function(response)
         {
             return response.json();
         }).then(function(data)
@@ -42,7 +43,6 @@ window.onload = function()
 
 function createItems(listDiv, data)
 {
-    console.log(data)
     const numFound = data["response"]["docs"].length;
 
     for (var i = 0; i < numFound; i++)
@@ -68,6 +68,12 @@ function createItems(listDiv, data)
         const content = document.createElement("div");
         content.textContent = data["response"]["docs"][i]["Content"]
         div.appendChild(content);
+
+        const score = document.createElement("div");
+        score.className = "score";
+        score.textContent = data["response"]["docs"][i]["Score"]
+        div.appendChild(score);
+
 
         listDiv.appendChild(div); 
     }
