@@ -1,0 +1,32 @@
+body
+{
+    padding: 2em;
+}
+
+form
+{
+    text-align: center;
+}
+
+#ftext
+{
+    width: 70%;
+}
+
+h1
+{
+    text-align: center;
+}
+
+#list
+{
+    text-align: center;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.item
+{
+    background-color: red;
+    padding: 1em;
+}

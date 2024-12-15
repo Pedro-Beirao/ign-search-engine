@@ -8,7 +8,29 @@
         document.querySelector("form").addEventListener("submit", function(e)
         {
             e.preventDefault();
-            fetch("http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=Content%3Ataito%27s&useParams=", {
+            const data = Object.fromEntries(new FormData(e.target).entries())
+            console.log(data)
+            
+            var q = ""
+            if (data["ftext"].length > 0)
+            {
+                q = "Title%3A" + data["ftext"] + "%0A" + 
+                    "Subtitle%3A" + data["ftext"] + "%0A" +
+                    "Subheader%3A" + data["ftext"] + "%0A" +
+                    "Content%3A" + data["ftext"] + "%0A";
+            }
+
+            var r = "";
+            for (var i = Number(data["fmin"]); i <= Number(data["fmax"]); i++)
+            {
+                r += "Score%3A" + i.toString() + "%0A"
+            }
+
+            const url = "http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=" + q + r;
+
+            console.log(url);
+            
+            fetch(url, {
                 method: 'GET'
             }).then(function(response)
             {
@@ -19,50 +41,20 @@
                 div.className = "item";
                 div.textContent = JSON.stringify(data);
 
-                document.getElementById("list").appendChild(div);  
+                var listDiv = document.getElementById("list");
+                listDiv.innerHTML = "";
+                listDiv.appendChild(div);  
             });
         });
     }
 </script>
-<style>
-    body
-    {
-        padding: 2em;
-    }
-
-    form
-    {
-        text-align: center;
-    }
-
-    #ftext
-    {
-        width: 70%;
-    }
-
-    h1
-    {
-        text-align: center;
-    }
-
-    #list
-    {
-        text-align: center;
-        padding-left: 10%;
-        padding-right: 10%;
-    }
-
-    .item
-    {
-        background-color: red;
-        padding: 1em;
-    }
-</style>
+<link rel="script" href="index.js">
+<link rel="stylesheet" href="index.css">
 </head>
 <body>
     <h1>IGN Review Search</h1>
     <form>
-        <input type="text" id="ftext" name="ftext" value="">
+        <input type="text" id="ftext" name="ftext" value="" placeholder="Search">
         <br><br>
         <label for="frat">Rating:</label><br>
         <input type="number" id="fmin" name="fmin" min="1" max="10" placeholder="1"> < 
