@@ -14,8 +14,10 @@ make up
 
 # Index data
 make index-data-subset
+# or
+make index-data-processed
 
-# Run test queries
+# Run test queries (only works on data-subset)
 make all-queries
 ```
 
