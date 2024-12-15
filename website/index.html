@@ -2,53 +2,7 @@
 <html>
 <head>
 <title>IGN Reviews Search</title>
-<script>
-    window.onload = function()
-    {
-        document.querySelector("form").addEventListener("submit", function(e)
-        {
-            e.preventDefault();
-            const data = Object.fromEntries(new FormData(e.target).entries())
-            console.log(data)
-            
-            var q = ""
-            if (data["ftext"].length > 0)
-            {
-                q = "Title%3A" + data["ftext"] + "%0A" + 
-                    "Subtitle%3A" + data["ftext"] + "%0A" +
-                    "Subheader%3A" + data["ftext"] + "%0A" +
-                    "Content%3A" + data["ftext"] + "%0A";
-            }
-
-            var r = "";
-            for (var i = Number(data["fmin"]); i <= Number(data["fmax"]); i++)
-            {
-                r += "Score%3A" + i.toString() + "%0A"
-            }
-
-            const url = "http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=" + q + r;
-
-            console.log(url);
-            
-            fetch(url, {
-                method: 'GET'
-            }).then(function(response)
-            {
-                return response.json();
-            }).then(function(data) {
-                const div = document.createElement("div");
-    
-                div.className = "item";
-                div.textContent = JSON.stringify(data);
-
-                var listDiv = document.getElementById("list");
-                listDiv.innerHTML = "";
-                listDiv.appendChild(div);  
-            });
-        });
-    }
-</script>
-<link rel="script" href="index.js">
+<script src="index.js"></script> 
 <link rel="stylesheet" href="index.css">
 </head>
 <body>
@@ -60,7 +14,7 @@
         <input type="number" id="fmin" name="fmin" min="1" max="10" placeholder="1"> < 
         <input type="number" id="fmax" name="fmax" min="1" max="10" placeholder="10">
         <br><br>
-        <input type="submit" value="Search">
+        <input id="submit" type="submit" value="Search">
     </form>
     <br>
     <div id="list">

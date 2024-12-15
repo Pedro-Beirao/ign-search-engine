@@ -3,18 +3,72 @@ window.onload = function()
     document.querySelector("form").addEventListener("submit", function(e)
     {
         e.preventDefault();
-        fetch("http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=Content%3Ataito%27s&useParams=", {
+        const data = Object.fromEntries(new FormData(e.target).entries())
+        console.log(data)
+        
+        var q = ""
+        if (data["ftext"].length > 0)
+        {
+            q = "Title%3A" + data["ftext"] + "%0A" + 
+                "Subtitle%3A" + data["ftext"] + "%0A" +
+                "Subheader%3A" + data["ftext"] + "%0A" +
+                "Content%3A" + data["ftext"] + "%0A";
+        }
+
+        var r = "";
+        for (var i = Number(data["fmin"]); i <= Number(data["fmax"]) && i != 0; i++)
+        {
+            r += "Score%3A" + i.toString() + "%0A"
+        }
+
+        const url = "http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=" + q + r;
+
+        console.log(url);
+        
+        fetch(url, {
             method: 'GET'
         }).then(function(response)
         {
             return response.json();
-        }).then(function(data) {
-            const div = document.createElement("div");
+        }).then(function(data)
+        {
+            var listDiv = document.getElementById("list");
+            listDiv.innerHTML = "";
 
-            div.className = "item";
-            div.textContent = JSON.stringify(data);
-
-            document.getElementById("list").appendChild(div);  
+            createItems(listDiv, data);
         });
     });
+}
+
+function createItems(listDiv, data)
+{
+    console.log(data)
+    const numFound = data["response"]["docs"].length;
+
+    for (var i = 0; i < numFound; i++)
+    {
+        const div = document.createElement("div");
+        div.className = "item";
+
+        const title = document.createElement("h2");
+        title.textContent = data["response"]["docs"][i]["Title"]
+        div.appendChild(title);
+
+        const subheader = document.createElement("h3");
+        subheader.textContent = data["response"]["docs"][i]["Subheader"]
+        div.appendChild(subheader);
+
+        const br = document.createElement("br");
+        div.appendChild(br);
+
+        const subtitle = document.createElement("h3");
+        subtitle.textContent = data["response"]["docs"][i]["Subtitle"]
+        div.appendChild(subtitle);
+
+        const content = document.createElement("div");
+        content.textContent = data["response"]["docs"][i]["Content"]
+        div.appendChild(content);
+
+        listDiv.appendChild(div); 
+    }
 }
