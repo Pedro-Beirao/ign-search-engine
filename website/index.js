@@ -1,70 +1,80 @@
-const express = require('express')
-const path = require('path');
-const app = express()
-const port = 3000
-
-
-app.use(express.static("public"));
-app.set('view engine', 'ejs');
-
-app.get('/', async (req, res) =>
+window.onload = function()
 {
-    var ftext = "";
-    if (req.query["ftext"]) ftext = req.query["ftext"];
-    var fmin = "";
-    if (req.query["fmin"]) fmin = req.query["fmin"];
-    var fmax = "";
-    if (req.query["fmax"]) fmax = req.query["fmax"];
-
-    var items = [];
-    if (req.query["ftext"] || req.query["fmin"] || req.query["fmax"])
-        items = await search(req);
-
-    res.render('index.ejs', 
+    document.querySelector("form").addEventListener("submit", function(e)
     {
-        ftext: ftext,
-        fmin: fmin,
-        fmax: fmax,
-        items: items
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target).entries())
+        console.log(data)
+        
+        var q = ""
+        if (data["ftext"].length > 0)
+        {
+            q = "Title%3A" + data["ftext"] + "%0A" + 
+                "Subtitle%3A" + data["ftext"] + "%0A" +
+                "Subheader%3A" + data["ftext"] + "%0A" +
+                "Content%3A" + data["ftext"] + "%0A";
+        }
+
+        var rmin = 1;
+        if (data["fmin"]) rmin = Number(data["fmin"]);
+        var rmax = 10;
+        if (data["fmax"]) rmax = Number(data["fmax"]);
+
+        var r = "";
+        for (var i = rmin; i <= rmax && i != 0; i++)
+        {
+            r += "Score%3A" + i.toString() + "%0A"
+        }
+
+        const url = "http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=" + q + "&fq=" + r;
+        
+        fetch(url, { method: 'GET' }).then(function(response)
+        {
+            return response.json();
+        }).then(function(data)
+        {
+            var listDiv = document.getElementById("list");
+            listDiv.innerHTML = "";
+
+            createItems(listDiv, data);
+        });
     });
-})
+}
 
-app.listen(port, () =>
+function createItems(listDiv, data)
 {
-  console.log(`Example app listening on port ${port}`)
-})
+    const numFound = data["response"]["docs"].length;
 
-async function search(req)
-{
-    const data = req.query;
-
-    var q = ""
-    if (data["ftext"] && data["ftext"].length > 0)
+    for (var i = 0; i < numFound; i++)
     {
-        q = "Title%3A" + data["ftext"] + "%0A" + 
-            "Subtitle%3A" + data["ftext"] + "%0A" +
-            "Subheader%3A" + data["ftext"] + "%0A" +
-            "Content%3A" + data["ftext"] + "%0A";
+        const div = document.createElement("div");
+        div.className = "item";
+
+        const title = document.createElement("h2");
+        title.textContent = data["response"]["docs"][i]["Title"]
+        div.appendChild(title);
+
+        const subheader = document.createElement("h3");
+        subheader.textContent = data["response"]["docs"][i]["Subheader"]
+        div.appendChild(subheader);
+
+        const br = document.createElement("br");
+        div.appendChild(br);
+
+        const subtitle = document.createElement("h3");
+        subtitle.textContent = data["response"]["docs"][i]["Subtitle"]
+        div.appendChild(subtitle);
+
+        const content = document.createElement("div");
+        content.textContent = data["response"]["docs"][i]["Content"]
+        div.appendChild(content);
+
+        const score = document.createElement("div");
+        score.className = "score";
+        score.textContent = data["response"]["docs"][i]["Score"]
+        div.appendChild(score);
+
+
+        listDiv.appendChild(div); 
     }
-
-    var rmin = 1;
-    if (data["fmin"]) rmin = Number(data["fmin"]);
-    var rmax = 10;
-    if (data["fmax"]) rmax = Number(data["fmax"]);
-
-    var r = "";
-    for (var i = rmin; i <= rmax && i != 0; i++)
-    {
-        r += "Score%3A" + i.toString() + "%0A"
-    }
-
-    if (q == "") q = r;
-    else q += "&fq=" + r;
-
-    const url = "http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=" + q;
-    console.log(url);
-    
-    const response = await fetch(url, { method: 'GET' });
-    const json = await response.json();
-    return json["response"]["docs"];
 }
