@@ -29,3 +29,15 @@ Allow CORS in your browser:
 [Firefox](https://addons.mozilla.org/en-US/firefox/addon/access-control-allow-origin/)
 
 Open [website/index.html](./website/index.html) in your browser
+
+### Run semantic search
+
+Only searches the title, for demonstration purposes
+
+```bash
+# Indexes a bert_vector for each review
+python3 scripts/semantic.py index
+
+# Runs semantic search for this query
+python3 scripts/semantic.py query <query>
+```
