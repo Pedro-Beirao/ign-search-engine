@@ -1,5 +1,3 @@
-// import { SentenceTransformer } from "@tuesdaycrowd/sentence-transformers";
-
 const express = require('express')
 const path = require('path');
 const app = express()
@@ -18,7 +16,9 @@ app.get('/', async (req, res) =>
     var fmax = "";
     if (req.query["fmax"]) fmax = req.query["fmax"];
 
-    const items = await search(req);
+    var items = [];
+    if (req.query["ftext"] || req.query["fmin"] || req.query["fmax"])
+        items = await search(req);
 
     res.render('index.ejs', 
     {
@@ -57,7 +57,7 @@ async function search(req)
     {
         r += "Score%3A" + i.toString() + "%0A"
     }
-    
+
     if (q == "") q = r;
     else q += "&fq=" + r;
 
@@ -68,14 +68,3 @@ async function search(req)
     const json = await response.json();
     return json["response"]["docs"];
 }
-
-
-
-
-
-
-
-async function getModel() {
-    return await SentenceTransformer.from_pretrained('Supabase/bge-small-en');
-    const { sentence_embedding } = await model.encode(['Hello world!']); // returns Tensor from '@xenova/transformers'
-  }
