@@ -7,9 +7,9 @@ window.onload = function()
         console.log(data)
         
         var q = ""
-        if (data["ftext"].length > 0)
+        if (data["ftext"] && data["ftext"].length > 0)
         {
-            q = "Title%3A" + data["ftext"] + "%0A" + 
+            q = "Title%3A" + data["ftext"] + "^50%0A" + 
                 "Subtitle%3A" + data["ftext"] + "%0A" +
                 "Subheader%3A" + data["ftext"] + "%0A" +
                 "Content%3A" + data["ftext"] + "%0A";
@@ -26,7 +26,10 @@ window.onload = function()
             r += "Score%3A" + i.toString() + "%0A"
         }
 
-        const url = "http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=" + q + "&fq=" + r;
+        if (q == "") q = r;
+        else q += "&fq=" + r;
+
+        const url = "http://127.0.0.1:8983/solr/ign_simple/select?indent=true&q.op=OR&q=" + q;
         
         fetch(url, { method: 'GET' }).then(function(response)
         {
