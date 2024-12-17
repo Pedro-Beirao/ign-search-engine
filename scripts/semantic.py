@@ -38,7 +38,6 @@ def update_dense_index():
     solr.commit()
 
 def keyword_search(query):
-    print(f"performing keyword search for {query}")
     solr_response=solr.search(
                         q=query,
                         rows=30,
@@ -49,7 +48,7 @@ def keyword_search(query):
                         defType='edismax',
                         ps='7',
                         wt='json')
-    print(f"found {len(solr_response)} results")
+    
     for item in solr_response:
         print(item['Title'])
 
@@ -58,7 +57,7 @@ def semantic_search(query):
     solr_response=solr.search(fl=['id','Title'],
                   q="{!knn f=bert_vector topK=10}"+str([float(w) for w in embedding[0]]),
                   rows = 30)
-    print(f"found {len(solr_response)} results")
+    
     for item in solr_response:
         print(item["Title"] + "\n")
 
