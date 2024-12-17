@@ -17,7 +17,7 @@ make index-data-subset
 # or
 make index-data-processed
 
-# Run test queries (only works on data-subset)
+# Run test queries
 make all-queries
 ```
 
