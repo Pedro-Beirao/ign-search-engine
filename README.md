@@ -1,4 +1,4 @@
-# PRI
+# IGN Search Engine
 
 ### Install required libraries
 
